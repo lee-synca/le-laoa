@@ -124,7 +124,7 @@ a:hover { color: var(--ochre); }
   align-items: flex-end;
   background-image: url('../assets/hero.jpg');
   background-size: cover;
-  background-position: center 30%;
+  background-position: center;
 }
 
 .hero::before {
@@ -562,8 +562,12 @@ a:hover { color: var(--ochre); }
   .nav-links a { padding: 12px 0; font-size: 18px; }
   .nav-links .btn { margin-top: 10px; }
   .nav-toggle { display: block; }
-  .hero { min-height: 480px; }
-  .hero .container { padding-top: 160px; }
+  .hero {
+    min-height: 640px;
+    background-image: url('../assets/hero-mobile.jpg');
+    background-position: center top;
+  }
+  .hero .container { padding-top: 300px; }
   .hero p { font-size: 17px; }
   .hero-actions .btn { width: 100%; justify-content: center; }
   .collection-grid { grid-template-columns: minmax(0, 1fr); }
