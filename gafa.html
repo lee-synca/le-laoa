@@ -77,7 +77,11 @@
   .couple strong { font-weight: 800; }
   .vb { color: var(--ochre-dark); font-style: italic; font-weight: 500; }
   .origin { color: var(--ink-2); }
-  .kids { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+  .kids {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center;
+    margin-left: 6px; padding-left: 14px; border-left: 2px solid #e4d6ba;
+  }
+  .kids + .kids { margin-top: 8px; }
   .kids-label { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: var(--tan-3); margin-right: 2px; }
   .kid {
     font-size: 14.5px;
@@ -134,6 +138,18 @@
   .ancestors .kids { margin-top: 16px; }
   .ancestors .kid { background: rgba(243,233,210,0.10); border-color: rgba(243,233,210,0.3); color: #f3e9d2; font-weight: 700; font-size: 15.5px; padding: 6px 16px; }
 
+  .map-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .map-scroll svg { display: block; min-width: 690px; width: 100%; max-width: 820px; height: auto; margin: 0 auto; }
+  .map-node { fill: #fffcf4; stroke: #e4d6ba; stroke-width: 1.5; }
+  .map-node-dark { fill: #241a10; }
+  .map-node-ochre { fill: #b3722c; }
+  .map-line { stroke: #c9a26a; stroke-width: 2.5; fill: none; }
+  .map-link { stroke: #a89475; stroke-width: 2; stroke-dasharray: 5 5; fill: none; }
+  .map-name { font-family: 'Alegreya Sans', sans-serif; font-size: 15px; font-weight: 700; fill: #2c2115; text-anchor: middle; }
+  .map-sub { font-family: 'Alegreya Sans', sans-serif; font-size: 11.5px; fill: #8a765a; text-anchor: middle; }
+  .map-col { font-family: 'Alegreya Sans', sans-serif; font-size: 12.5px; font-weight: 700; letter-spacing: 2px; fill: #92591f; text-anchor: middle; }
+  .map-scroll a:hover .map-node { stroke: #b3722c; }
+
   .tree-section { padding-bottom: 72px; }
   .tree-section h2 { margin-bottom: 6px; }
   .tree-section .sub { font-size: 17px; color: var(--ink-2); margin: 0 0 30px; max-width: 760px; }
@@ -179,6 +195,107 @@
     </div>
   </div>
 </header>
+
+<!-- Map of the gafa -->
+<section class="section" style="padding-bottom:48px">
+  <div class="container">
+    <div class="section-head" style="margin-bottom:18px">
+      <div>
+        <div class="eyebrow" style="color:#92591f">The shape of it all</div>
+        <h2>O le ata o le gafa — the map</h2>
+        <p class="lede">The whole book at a glance: two lines, three branches, one marriage joining them. Tap any box to jump to that part of the tree.</p>
+      </div>
+    </div>
+    <div class="map-scroll">
+      <svg viewBox="0 0 760 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Map of the gafa: the Li‘o title line and the Su‘e Tu‘ulau line with their branches">
+        <text class="map-col" x="190" y="28">O LE LAINA O LE SUAFA LI‘O</text>
+        <text class="map-col" x="560" y="28">O LE GAFA O SU‘E TU‘ULAU</text>
+
+        <!-- trunks -->
+        <line class="map-line" x1="190" y1="86" x2="190" y2="462"/>
+        <line class="map-line" x1="560" y1="86" x2="560" y2="482"/>
+
+        <!-- branch elbows -->
+        <path class="map-line" d="M190 220 L250 220 L250 231 L302 231"/>
+        <path class="map-line" d="M190 322 L162 322"/>
+        <path class="map-line" d="M190 408 L250 408 L250 448 L288 448"/>
+
+        <!-- marriage link: Foumalo (Su'e line) and Siemsen (Maugata line) -->
+        <path class="map-link" d="M365 474 L365 516 L428 516"/>
+        <text class="map-sub" x="358" y="541" text-anchor="start">Foumalo usuia e Siemsen</text>
+
+        <!-- Li'o column -->
+        <a href="#lio">
+          <rect class="map-node" x="100" y="50" width="180" height="36" rx="10"/>
+          <text class="map-name" x="190" y="73">Malietoa Savea</text>
+        </a>
+        <a href="#lio">
+          <rect class="map-node" x="100" y="136" width="180" height="48" rx="10"/>
+          <text class="map-name" x="190" y="156">Li‘o Sesele</text>
+          <text class="map-sub" x="190" y="174">le Li‘o muamua (7)</text>
+        </a>
+        <a href="#lio">
+          <rect class="map-node" x="302" y="208" width="152" height="46" rx="10"/>
+          <text class="map-name" x="378" y="227" style="font-size:13.5px">Suafa Li‘o Sapapali‘i</text>
+          <text class="map-sub" x="378" y="244">e o‘o mai le aso (10)</text>
+        </a>
+        <a href="#lio">
+          <rect class="map-node" x="100" y="246" width="180" height="36" rx="10"/>
+          <text class="map-name" x="190" y="269">Li‘o Pa‘ifagafaga (15)</text>
+        </a>
+        <a href="#lio">
+          <rect class="map-node" x="18" y="300" width="144" height="46" rx="10"/>
+          <text class="map-name" x="90" y="319" style="font-size:13.5px">Laina o Li‘o Loa</text>
+          <text class="map-sub" x="90" y="336">(16 a–e)</text>
+        </a>
+        <a href="#lio">
+          <rect class="map-node" x="100" y="352" width="180" height="36" rx="10"/>
+          <text class="map-name" x="190" y="375">Li‘o Fa‘alotoina (20)</text>
+        </a>
+        <a href="#maugata">
+          <rect class="map-node" x="288" y="425" width="150" height="46" rx="10"/>
+          <text class="map-name" x="363" y="444" style="font-size:13.5px">Maugata &#8594; Siemsen</text>
+          <text class="map-sub" x="363" y="461">i fafo atu o Samoa</text>
+        </a>
+        <a href="#lio">
+          <rect class="map-node" x="100" y="462" width="180" height="48" rx="10"/>
+          <text class="map-name" x="190" y="482">Li‘o Ta‘avale</text>
+          <text class="map-sub" x="190" y="500">e pa (23)</text>
+        </a>
+
+        <!-- Su'e column -->
+        <a href="#sue">
+          <rect class="map-node" x="465" y="50" width="190" height="36" rx="10"/>
+          <text class="map-name" x="560" y="73">Nofoasaefa</text>
+        </a>
+        <a href="#sue">
+          <rect class="map-node" x="465" y="126" width="190" height="48" rx="10"/>
+          <text class="map-name" x="560" y="146">Su‘e Tu‘ulau I</text>
+          <text class="map-sub" x="560" y="164">Fatalefua</text>
+        </a>
+        <a href="#sue">
+          <rect class="map-node" x="465" y="214" width="190" height="48" rx="10"/>
+          <text class="map-name" x="560" y="234">Lalau Isa‘aka</text>
+          <text class="map-sub" x="560" y="252">10 f&#257;nau</text>
+        </a>
+        <a href="#sue">
+          <rect class="map-node" x="465" y="302" width="190" height="36" rx="10"/>
+          <text class="map-name" x="560" y="325">Fa‘aleaga</text>
+        </a>
+        <a href="#sue">
+          <rect class="map-node map-node-ochre" x="465" y="378" width="190" height="40" rx="10"/>
+          <text class="map-name" x="560" y="403" style="fill:#fdf8ec">SU‘E</text>
+        </a>
+        <a href="#sue">
+          <rect class="map-node map-node-dark" x="428" y="464" width="314" height="76" rx="12"/>
+          <text class="map-name" x="585" y="487" style="fill:#f3e9d2;font-size:14px">O le f&#257;nau e to‘aono a Su‘e</text>
+          <text class="map-sub" x="585" y="507" style="fill:#cdbb9b;font-size:12.5px">Uesa &#183; Pouono &#183; ‘Ulugagana</text>
+          <text class="map-sub" x="585" y="525" style="fill:#cdbb9b;font-size:12.5px">Aniva &#183; Li‘o Iosefa &#183; Foumalo</text>
+        </a>
+      </svg>
+    </div>
+  </div>
+</section>
 
 <!-- How to read a gafa -->
 <section class="section" style="padding-bottom:64px">
