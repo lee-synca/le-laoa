@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Family Tree — Le Laoa</title>
+<meta name="description" content="The gafa of the suafa Li‘o and of Su‘e Tu‘ulau, as an interactive family tree — with a guide to reading a gafa.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .gafa-intro { max-width: 760px; }
+  .page-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+
+  .glossary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .gloss {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 18px;
+  }
+  .gloss .term { font-weight: 800; color: var(--ink); font-size: 16px; }
+  .gloss .def { font-size: 15px; color: var(--ink-2); margin-top: 2px; }
+
+  .search-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 8px 0 30px; }
+  .search-row input {
+    flex-grow: 1;
+    max-width: 420px;
+    font-family: var(--body);
+    font-size: 17px;
+    padding: 12px 18px;
+    border: 1.5px solid #ddcdae;
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--ink);
+  }
+  .search-row input:focus { outline: none; border-color: var(--ochre); }
+  #search-count { font-size: 15px; color: var(--ink-2); }
+
+  .chain { display: flex; flex-direction: column; }
+  .gen { position: relative; padding: 0 0 30px 48px; }
+  .gen::before {
+    content: '';
+    position: absolute;
+    left: 15px; top: 34px; bottom: -4px;
+    width: 2px;
+    background: #d8c6a4;
+  }
+  .gen:last-child::before { display: none; }
+  .gen-num {
+    position: absolute;
+    left: 0; top: 0;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .gen-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 22px;
+  }
+  .gen.hit .gen-card { border-color: var(--ochre); box-shadow: 0 0 0 3px rgba(179,114,44,0.18); }
+  .couple { font-size: 17px; line-height: 1.5; color: var(--ink); }
+  .couple strong { font-weight: 800; }
+  .vb { color: var(--ochre-dark); font-style: italic; font-weight: 500; }
+  .origin { color: var(--ink-2); }
+  .kids { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+  .kids-label { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: var(--tan-3); margin-right: 2px; }
+  .kid {
+    font-size: 14.5px;
+    font-weight: 500;
+    color: #5c4a35;
+    background: #f3ecdc;
+    border: 1px solid #e4d6ba;
+    border-radius: 999px;
+    padding: 4px 13px;
+  }
+  .kid.next { background: var(--ochre); border-color: var(--ochre); color: var(--paper); font-weight: 700; }
+  .note-line { margin-top: 10px; font-size: 14.5px; color: var(--ink-2); font-style: italic; }
+  .epa {
+    display: inline-flex;
+    margin-top: 10px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #8c4a2f;
+    background: #f6e3d7;
+    border-radius: 999px;
+    padding: 4px 13px;
+  }
+
+  details.branch { margin: 2px 0 14px; }
+  details.branch > summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--ochre-dark);
+    font-size: 15.5px;
+    padding: 10px 0;
+    list-style-position: inside;
+  }
+  details.branch .chain { margin-top: 10px; padding-left: 6px; }
+  details.branch .gen-num { background: #8a765a; }
+
+  .section-note {
+    background: #f3ecdc;
+    border: 1px solid #e4d6ba;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 15px;
+    color: var(--ink-2);
+    max-width: 760px;
+    margin-bottom: 34px;
+  }
+
+  .ancestors {
+    background: var(--brown);
+    border-radius: 14px;
+    padding: 26px 28px;
+  }
+  .ancestors .t { font-family: var(--display); font-size: 22px; color: #f3e9d2; }
+  .ancestors .s { font-size: 15px; color: var(--tan); margin-top: 4px; }
+  .ancestors .kids { margin-top: 16px; }
+  .ancestors .kid { background: rgba(243,233,210,0.10); border-color: rgba(243,233,210,0.3); color: #f3e9d2; font-weight: 700; font-size: 15.5px; padding: 6px 16px; }
+
+  .tree-section { padding-bottom: 72px; }
+  .tree-section h2 { margin-bottom: 6px; }
+  .tree-section .sub { font-size: 17px; color: var(--ink-2); margin: 0 0 30px; max-width: 760px; }
+
+  @media (max-width: 760px) {
+    .glossary { grid-template-columns: minmax(0, 1fr); }
+    .gen { padding-left: 40px; }
+    .gen-num { width: 28px; height: 28px; font-size: 12px; }
+    .gen::before { left: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-name">LE LAOA</span>
+      <span class="brand-sub">Descendants of Su‘e Tu‘ulau</span>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 6.5h16M4 12h16M4 17.5h16" stroke="#f3e9d2" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <div class="nav-links" id="nav-links">
+      <a href="index.html">Home</a>
+      <a href="videos.html">Videos</a>
+      <a href="gafa.html" class="active">Family Tree</a>
+      <a href="index.html#ebooks">E-books</a>
+      <a href="about.html">About</a>
+    </div>
+  </div>
+</nav>
+
+<header class="page-head">
+  <div class="container">
+    <div class="eyebrow">O le gafa</div>
+    <h1>The Family Tree</h1>
+    <p class="gafa-intro">Everything on this page comes from the family book <em>Gafa Fa‘avae ole Suafa Li‘o</em> (tusia 30-1-2007) — laid out as a tree you can follow, instead of pages of text. Start with the guide below, then trace the lines down.</p>
+    <div class="page-actions">
+      <a class="btn" href="reader.html?book=gafa" style="font-size:15px; padding:10px 20px;">Read the original book</a>
+      <a class="btn btn-outline-dark" href="videos.html#v=272057519" style="font-size:15px; padding:9px 20px;">Watch: Gafa — Family Tree</a>
+      <a class="btn btn-outline-dark" href="videos.html#v=272057592" style="font-size:15px; padding:9px 20px;">Watch: Gafa — Tala‘aga</a>
+    </div>
+  </div>
+</header>
+
+<!-- How to read a gafa -->
+<section class="section" style="padding-bottom:64px">
+  <div class="container">
+    <div class="section-head" style="margin-bottom:22px">
+      <div>
+        <div class="eyebrow" style="color:#92591f">Start here</div>
+        <h2>How to read a gafa</h2>
+        <p class="lede">A gafa is written in a fixed formula. Learn these few words once, and the whole book opens up.</p>
+      </div>
+    </div>
+    <div class="glossary">
+      <div class="gloss"><div class="term">usu <span style="font-weight:400">[name]</span> ia <span style="font-weight:400">[name]</span></div><div class="def">The man named first married the woman named second.</div></div>
+      <div class="gloss"><div class="term">usuia <span style="font-weight:400">[name]</span> e <span style="font-weight:400">[name]</span></div><div class="def">The woman is named first — she was married by the man named second.</div></div>
+      <div class="gloss"><div class="term">f/g &middot; fānau</div><div class="def">The children born of that marriage (the book's own note: &ldquo;f.g&hellip; Fanau/Fagau&hellip; Born&rdquo;).</div></div>
+      <div class="gloss"><div class="term">afafine o / alo o</div><div class="def">Daughter of / child of — telling you whose family the wife comes from, and her village.</div></div>
+      <div class="gloss"><div class="term">tama / teine</div><div class="def">Boy / girl. &ldquo;Tama uma&rdquo; — all boys; &ldquo;teine uma&rdquo; — all girls.</div></div>
+      <div class="gloss"><div class="term">suli</div><div class="def">Heir — the one through whom the title and the line continue.</div></div>
+      <div class="gloss"><div class="term">e pa</div><div class="def">The line ended there — no heir was left to continue it.</div></div>
+      <div class="gloss"><div class="term">usuga (1), (2)</div><div class="def">First marriage, second marriage.</div></div>
+      <div class="gloss"><div class="term">suafa</div><div class="def">A chiefly title — here, the title Li‘o of Si‘umu.</div></div>
+      <div class="gloss"><div class="term">tuafafine</div><div class="def">Sister (of a man).</div></div>
+      <div class="gloss"><div class="term">F.S. &middot; Faife‘au Samoa</div><div class="def">Church minister (the book's own note).</div></div>
+      <div class="gloss"><div class="term" style="color:#92591f">In the tree below</div><div class="def">The <span class="kid next" style="font-size:12.5px; padding:2px 10px">orange name</span> is the child the line continues through.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Search -->
+<section class="container" style="padding-bottom:8px">
+  <div class="search-row">
+    <input type="search" id="name-search" placeholder="Search for a name&hellip;" aria-label="Search for a name">
+    <span id="search-count"></span>
+  </div>
+  <div class="section-note">Transcribed with care from the family book — the book itself remains the authority. If you spot a name that needs correcting, please tell the site admins so it can be fixed for everyone.</div>
+</section>
+
+<!-- Li'o line -->
+<section class="container tree-section" id="lio">
+  <div class="eyebrow" style="color:#92591f">Part one</div>
+  <h2>O le laina o le suafa Li‘o</h2>
+  <p class="sub">Twenty-three generations, from Malietoa Savea to Li‘o Ta‘avale — the founding line of the title Li‘o of Si‘umu.</p>
+
+  <div class="chain">
+    <div class="gen"><div class="gen-num">1</div><div class="gen-card">
+      <div class="couple"><strong>Malietoa Savea</strong> <span class="vb">usu ia</span> <strong>Amaama‘ula</strong> <span class="origin">— afafine o Luafatasaga o Tuana‘i</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Malietoa Le‘upolu Ganasavea</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">2</div><div class="gen-card">
+      <div class="couple"><strong>Malietoa Le‘upolu Ganasavea</strong> <span class="vb">usu ia</span> <strong>Pate</strong> <span class="origin">— afafine o le Tuitoga</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid">Nu‘uiali‘i</span><span class="kid">Seupule</span><span class="kid">Taogaga</span><span class="kid">Poluleuligana</span><span class="kid next">Saveatama</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">3</div><div class="gen-card">
+      <div class="couple"><strong>Saveatama</strong> <span class="vb">usugafa ia</span> <strong>Gau‘imatuli</strong> <span class="origin">— afafine o ‘Ale o Toamua</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Alae</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">4</div><div class="gen-card">
+      <div class="couple"><strong>Alae</strong> <span class="vb">usu ia</span> <strong>Semalamailagi</strong> <span class="origin">— o le afafine Tuitua Tualemoso</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid">Pou‘alae <small>(tama)</small></span><span class="kid next">Si‘aioalae <small>(teine)</small></span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">5</div><div class="gen-card">
+      <div class="couple"><strong>Si‘aioalae</strong> <span class="vb">usuia e</span> <strong>Matuafineitalaga</strong> <span class="origin">o Fusi Saluafata</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Luafatao‘alae <small>(teine)</small></span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">6</div><div class="gen-card">
+      <div class="couple"><strong>Luafatao‘alae</strong> <span class="vb">usuia e</span> <strong>Tuiatua Tologataua</strong></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Fatumanava‘upolu <small>(tama)</small></span><span class="kid">Taelalopu‘a <small>(teine)</small></span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">7</div><div class="gen-card">
+      <div class="couple"><strong>Fatumanava‘upolu</strong> <span class="vb">usugafa ia</span> <strong>Sinaleatea</strong> <span class="origin">— o le afafine o Malietoa Folasaitu o Faleata</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Li‘o Sesele</span></div>
+      <div class="note-line">&ldquo;O Li‘o Leo‘o fo‘i lea&rdquo; — here the name Li‘o first appears in the gafa.</div>
+    </div></div>
+    <div class="gen"><div class="gen-num">8</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Sesele</strong> <span class="origin">(Li‘o Leo‘o)</span> <span class="vb">usu ia</span> <strong>Tasalutele</strong> <span class="origin">— o le afafine o Asi o Moata‘a</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Li‘o Matafili</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">9</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Matafili</strong> <span class="vb">usu ia</span> <strong>Palolo</strong> <span class="origin">— o le afafine o Tofilau o ‘iva</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid">Li‘o Mago</span><span class="kid next">Li‘o Ogevai</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(o tama uma)</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">10</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Mago</strong> <span class="vb">usu ia</span> <strong>Olovesi</strong> <span class="origin">o Sapapali‘i</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid">Li‘o Tama</span></div>
+      <div class="note-line">O le Li‘o lea o lo‘o iai le suafa Li‘o Sapapali‘i e o‘o mai le aso — this branch carries the Li‘o title of Sapapali‘i to this day.</div>
+    </div></div>
+    <div class="gen"><div class="gen-num">11</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Ogevai</strong> <span class="vb">usugafa ia</span> <strong>Moana</strong> <span class="origin">— le afafine Luatua o Saleimoa</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Li‘o Faimiti</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">12</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Faimiti</strong> <span class="vb">usu ia</span> <strong>Sina‘aletoa</strong> <span class="origin">— o le afafine o Foutanu o Saluafata</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Li‘o Faitui</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">13</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Faitui</strong> <span class="vb">usu ia</span> <strong>Manu</strong> <span class="origin">— o le afafine o Tiatia o Lalomanu</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Li‘o Tutupu</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">14</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Tutupu</strong> <span class="vb">usu ia</span> <strong>Paetele</strong> <span class="origin">— o le afafine o Lupeomanu o Poutasi</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Li‘o Pa‘ifagafaga</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">15</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Pa‘ifagafaga</strong> <span class="vb">usu ia</span> <strong>Pola</strong> <span class="origin">— o le afafine o Tele‘a o Faleula</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Li‘o Namuafuluga</span><span class="kid">Li‘o Loa</span></div>
+      <details class="branch">
+        <summary>O le laina o Li‘o Loa (16 a&ndash;e) — le uso o Li‘o Namuafuluga</summary>
+        <div class="chain">
+          <div class="gen"><div class="gen-num">a</div><div class="gen-card">
+            <div class="couple"><strong>Li‘o Loa</strong> <span class="vb">usu ia</span> <strong>Taimane</strong> <span class="origin">— o le afafine o Leoso o Leone Tutuila</span></div>
+            <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Li‘o Atofau</span></div>
+          </div></div>
+          <div class="gen"><div class="gen-num">b</div><div class="gen-card">
+            <div class="couple"><strong>Li‘o Atofau</strong> <span class="vb">usu ia</span> <strong>Tapa‘auaunoa</strong></div>
+            <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Tupua</span></div>
+          </div></div>
+          <div class="gen"><div class="gen-num">c</div><div class="gen-card">
+            <div class="couple"><strong>Tupua</strong> <span class="vb">usu ia</span> <strong>Lumapa‘itogaoa</strong></div>
+            <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Solio‘o</span></div>
+          </div></div>
+          <div class="gen"><div class="gen-num">d</div><div class="gen-card">
+            <div class="couple"><strong>Solio‘o</strong> <span class="vb">usuia e</span> <strong>Lutuiloa Oteamoa</strong> <span class="origin">o Siumu</span></div>
+            <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Tala‘epa Malosi</span></div>
+          </div></div>
+          <div class="gen"><div class="gen-num">e</div><div class="gen-card">
+            <div class="couple"><strong>Tala‘epa Malosi</strong> <span class="vb">usu ia</span> <strong>Tepatasi</strong> <span class="origin">o Salani, Falealili</span></div>
+            <div class="kids"><span class="kids-label">F/G</span><span class="kid">Mugagi</span></div>
+          </div></div>
+        </div>
+      </details>
+    </div></div>
+    <div class="gen"><div class="gen-num">17</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Namuafuluga</strong> <span class="vb">usugafa ia</span> <strong>Teleuli</strong> <span class="origin">— o le afafine o Te‘o, Vaie‘e</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Li‘o Fa‘apoaitu <small>(tama)</small></span><span class="kid">Lesa <small>(teine)</small></span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">18</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Fa‘apoaitu</strong> <span class="vb">usu ia</span> <strong>Lafua</strong> <span class="origin">— o le afafine o Taumuafono Leota o Mulivai Safata</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Li‘o Tauvelavela</span><span class="kid">Pa‘itosi</span><span class="kid">Ausi</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(o tama uma)</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">19</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Tauvelavela</strong> <span class="vb">usugafa ia</span> <strong>‘Ula</strong> <span class="origin">— o le afafine o ‘Ese o Maninoa Si‘umu</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Li‘o Fa‘alotoina</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">20</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Fa‘alotoina</strong> <span class="vb">usugafa ia</span> <strong>Tuaolo</strong> <span class="origin">— o le afafine o Atanoa o Siumu</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Li‘o Pa‘i <small>(tama)</small></span><span class="kid">Maugata <small>(teine)</small></span></div>
+      <div class="note-line">Silasila i le gafa o Maugata — <a href="#maugata">see Maugata's line in part three below</a>.</div>
+    </div></div>
+    <div class="gen"><div class="gen-num">21</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Pa‘i</strong> <span class="vb">usu ia</span> <strong>Tauvaga</strong> <span class="origin">— o le afafine o Tapu o Saleilua Falealili</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Sai‘aiga <small>(teine)</small></span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">22</div><div class="gen-card">
+      <div class="couple"><strong>Sai‘aiga</strong> <span class="vb">usuia e</span> <strong>Faumuina Lavilavi</strong> <span class="origin">o Gagaifo Lefaga</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Li‘o Ta‘avale <small>(tama)</small></span><span class="kid">Foumalo <small>(teine)</small></span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">23</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Ta‘avale</strong> <span class="vb">usu ia</span> <strong>Fefiloi</strong> <span class="origin">— o le afafine o Tofaeono o S‘iumu</span></div>
+      <div class="epa">E pa — leai se tama (suli)</div>
+    </div></div>
+  </div>
+</section>
+
+<!-- Su'e Tu'ulau line -->
+<section class="band" id="sue">
+  <div class="container tree-section" style="padding-top:72px">
+    <div class="eyebrow" style="color:#92591f">Part two</div>
+    <h2>O le gafa o Su‘e Tu‘ulau i Saleilua</h2>
+    <p class="sub">The line this whole site is named for — from Nofoasaefa to Su‘e, and the generation whose faces you see at the top of the homepage.</p>
+
+    <div class="chain">
+      <div class="gen"><div class="gen-num">1</div><div class="gen-card">
+        <div class="couple"><strong>Nofoasaefa</strong> <span class="origin">o Lufilufi</span> <span class="vb">usu ia</span> <strong>Va‘asa</strong> <span class="origin">— le alo o Fiame i Lotofaga</span></div>
+        <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Fatalefua <small>(tama)</small></span></div>
+      </div></div>
+      <div class="gen"><div class="gen-num">2</div><div class="gen-card">
+        <div class="couple"><strong>Fatalefua</strong> <span class="origin">(Su‘e Tu‘ulau I)</span> <span class="vb">usu ia</span> <strong>Fiasili</strong> <span class="origin">— le alo o Lalau Leo‘o i Salesatele</span></div>
+        <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Lalau Isa‘aka <small>(tama)</small></span></div>
+      </div></div>
+      <div class="gen"><div class="gen-num">3</div><div class="gen-card">
+        <div class="couple"><strong>Lalau Isa‘aka</strong> <span class="vb">usu ia</span> <strong>To‘atasi</strong> <span class="origin">— le alo o Tuiloma i Sapunaoa</span></div>
+        <div class="kids"><span class="kids-label">F/G</span>
+          <span class="kid">Faraimo</span><span class="kid">Va‘amao</span><span class="kid">Alefaio</span><span class="kid">Isa‘aka</span><span class="kid">Sataoa</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(tama)</span>
+          <span class="kid">Maisu</span><span class="kid">Silifu</span><span class="kid">Sela</span><span class="kid">Solonaiama</span><span class="kid next">Fa‘aleaga</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(teine)</span>
+        </div>
+        <details class="branch">
+          <summary>Usuga a le fānau a Lalau Isa‘aka — the children's own lines</summary>
+          <div class="chain">
+            <div class="gen"><div class="gen-num">•</div><div class="gen-card">
+              <div class="couple"><strong>Faraimo</strong> <span class="vb">usu ia</span> <strong>Tailevao</strong> <span class="origin">— le alo o Tiatia i Lalomauga</span></div>
+              <div class="kids"><span class="kids-label">F/G</span><span class="kid">Fa‘aso‘o <small>(teine)</small></span></div>
+              <div class="note-line">Fa‘aso‘o usuia e Misiluti — le alo o ‘Ai‘ono A. o Fasito‘outa. F/g: Salu ma Soliali‘i (teine) ma Misiluti le tama.</div>
+            </div></div>
+            <div class="gen"><div class="gen-num">•</div><div class="gen-card">
+              <div class="couple"><strong>Va‘amao</strong> <span class="vb">usu ia</span> <strong>Lisi</strong> <span class="origin">— le alo o So‘iso‘i Fasito‘outa</span></div>
+              <div class="kids"><span class="kids-label">F/G</span><span class="kid">Faleu <small>(teine)</small></span><span class="kid">Tamati <small>(tama)</small></span><span class="kid">Atele <small>(teine)</small></span></div>
+              <div class="note-line">Faleu usuia e Viliamu F.S. — le alo o Li‘o i Sapapali‘i. F/g: Litara (teine), Ropati (tama), Avaoi‘a (teine), Livi (tama), Viliamu (tama).</div>
+              <div class="note-line">Faleu, lona (2), usuia e Tuigamala Titi o Vailu‘utai. F/g: T. Filemoni, Poni, Va‘amao, Vilia (tama uma).</div>
+              <div class="note-line">Tamati, usuga (1), ia Lima — le alo o Patau o Vailu‘utai. F/g: Lisi ma Sisi (teine uma).</div>
+              <div class="note-line">Tamati, usuga (2), ia Pekina — le alo o Sa F.S. i Vailu‘utai lava. F/g: Misikei, Ropati, ma Lami (tama uma).</div>
+              <div class="note-line">Atele usuia e Lilo o Sato‘alepai. F/g: teine o Momoi ma Lonise&hellip; Alefaio (tama, e pa)&hellip; Sataoa (tama, e pa).</div>
+            </div></div>
+            <div class="gen"><div class="gen-num">•</div><div class="gen-card">
+              <div class="couple"><strong>Isa‘aka</strong>, usuga (2), <span class="vb">usu ia</span> <strong>Saina</strong> <span class="origin">— le alo o Lauvi i Sa‘anapu</span></div>
+              <div class="kids"><span class="kids-label">F/G</span><span class="kid">Fiso</span><span class="kid">Iaga</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(teine uma)</span></div>
+              <div class="note-line">Fiso usuia e So‘oalo o Vaigana. F/g: Pauline (teine), Afereti (tama), Tauati (tama), Iva (teine), Ulumoe (teine).</div>
+            </div></div>
+            <div class="gen"><div class="gen-num">•</div><div class="gen-card">
+              <div class="couple"><strong>Maisu</strong> <span class="vb">usuia e</span> <strong>Le‘apai</strong> <span class="origin">o Vaimoso</span></div>
+              <div class="kids"><span class="kids-label">F/G</span><span class="kid">Ve‘a <small>(tama)</small></span></div>
+            </div></div>
+            <div class="gen"><div class="gen-num">•</div><div class="gen-card">
+              <div class="couple"><strong>Silifu</strong> <span class="vb">usuia e</span> <strong>Sa</strong> <span class="origin">o Salani</span></div>
+              <div class="kids"><span class="kids-label">F/G</span><span class="kid">Fa‘afo‘i <small>(tama)</small></span></div>
+              <div class="note-line">Na maliu ae leai sona suli.</div>
+            </div></div>
+            <div class="gen"><div class="gen-num">•</div><div class="gen-card">
+              <div class="couple"><strong>Sela</strong> <span class="vb">usuia e</span> <strong>Uta‘ile‘ofe F.S.</strong> <span class="origin">o Samamea</span></div>
+              <div class="kids"><span class="kids-label">F/G</span><span class="kid">Iusitini</span></div>
+              <div class="note-line">Iusitini usu ia Silulu — le alo o Sio Peseta. F/g: Leuatea (tama), Lonise (teine), Molipopo.</div>
+            </div></div>
+            <div class="gen"><div class="gen-num">•</div><div class="gen-card">
+              <div class="couple"><strong>Solonaima</strong> <span class="vb">usuia e</span> <strong>Atuli F.S.</strong> <span class="origin">— le alo o Lemalu o Matautu Lefaga</span></div>
+              <div class="kids"><span class="kids-label">F/G</span><span class="kid">Matautu</span><span class="kid">Iupeli</span><span class="kid">Fatafa</span><span class="kid">Fa‘ala <small>(teine)</small></span><span class="kid">Ielu</span></div>
+            </div></div>
+          </div>
+        </details>
+      </div></div>
+      <div class="gen"><div class="gen-num">4</div><div class="gen-card">
+        <div class="couple"><strong>Fa‘aleaga</strong> <span class="vb">usuia e</span> <strong>Uria F.S.</strong> <span class="origin">— le alo o Tu‘ulau‘ulu i Saleilua</span></div>
+        <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Su‘e <small>(tama)</small></span><span class="kid">So‘o <small>(le teine)</small></span></div>
+      </div></div>
+      <div class="gen"><div class="gen-num">5</div><div class="gen-card">
+        <div class="couple"><strong>Su‘e</strong>, usuga (1), <span class="vb">usu ia</span> <strong>Sorepa</strong> <span class="origin">o Ili‘ili i Saleilua</span></div>
+        <div class="kids"><span class="kids-label">F/G</span><span class="kid">le teine o Uesa</span></div>
+        <div class="couple" style="margin-top:16px"><strong>Su‘e</strong>, usuga (2), <span class="vb">usu ia</span> <strong>Foumalo</strong> <span class="origin">— le alo o Faumuina i Lefaga</span></div>
+        <div class="kids"><span class="kids-label">F/G</span><span class="kid">Pouono <small>(tama)</small></span><span class="kid">‘Ulugagana <small>(teine)</small></span><span class="kid">Aniva <small>(teine)</small></span><span class="kid">Iosefa <small>(tama)</small></span><span class="kid">Foumalo <small>(le teine)</small></span></div>
+      </div></div>
+      <div class="gen"><div class="gen-num">★</div><div class="ancestors">
+        <div class="t">The six children of Su‘e Tu‘ulau</div>
+        <div class="s">The faces on the homepage — the generation every descendant on this site traces back to.</div>
+        <div class="kids"><span class="kid">Uesa</span><span class="kid">Pouono</span><span class="kid">‘Ulugagana</span><span class="kid">Aniva</span><span class="kid">Li‘o Iosefa</span><span class="kid">Foumalo</span></div>
+      </div></div>
+      <div class="gen"><div class="gen-num">6</div><div class="gen-card">
+        <div class="couple"><strong>Li‘o Iosefa</strong> <span class="vb">usufaga ia</span> <strong>Fa‘ai‘u Manu Samuelu</strong> <span class="origin">o Fasito‘otai</span></div>
+        <div class="kids"><span class="kids-label">F/G</span><span class="kid">Fata Sakaria</span><span class="kid">Laulauofolasa Samoa</span><span class="kid">Pou‘alae Samuelu</span><span class="kid">Saveatama Sinapati</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(tama)</span></div>
+        <div class="kids"><span class="kid">Fofoa‘iva‘oese</span><span class="kid">Lealoa</span><span class="kid">Pea‘ario</span><span class="kid">Tumua</span><span class="kid">Eseta</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(teine)</span></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Maugata line -->
+<section class="container tree-section" id="maugata" style="padding-top:72px">
+  <div class="eyebrow" style="color:#92591f">Part three</div>
+  <h2>O le gafa o Maugata — le tuafafine o Li‘o Pa‘i</h2>
+  <p class="sub">Maugata is the sister of Li‘o Pa‘i (generation 20 in part one). Her line runs through the Siemsen family to descendants living overseas today.</p>
+
+  <div class="chain">
+    <div class="gen"><div class="gen-num">1</div><div class="gen-card">
+      <div class="couple"><strong>Maugata</strong> <span class="vb">usuia e</span> <strong>Moetua‘au</strong> <span class="origin">o Sa‘aga Si‘umu</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid">Li‘o Sakaria <small>(tama)</small></span><span class="kid next">Sialafia <small>(teine)</small></span><span class="kid">Lili‘a <small>(teine)</small></span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">2</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Sakaria</strong> <span class="vb">usugafa ia</span> <strong>Tu‘i Tala‘epa</strong> <span class="origin">o Si‘umu</span></div>
+      <div class="epa">E pa (e leai se tama) — suli</div>
+    </div></div>
+    <div class="gen"><div class="gen-num">3</div><div class="gen-card">
+      <div class="couple"><strong>Sialafia</strong> <span class="vb">usuia e</span> <strong>Pauga</strong> <span class="origin">o Poutasi Falealili</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid next">Li‘o Matagi</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">4</div><div class="gen-card">
+      <div class="couple"><strong>Li‘o Matagi</strong> <span class="vb">usuia e</span> <strong>Siemsen</strong> <span class="origin">— o le Siamani</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid">Saveatama Hunt <small>(Anisi)</small></span><span class="kid">Karl <small>(tama)</small></span><span class="kid">Josephine <small>(Sose)</small></span><span class="kid">Agnes <small>(Ake)</small></span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">5</div><div class="gen-card">
+      <div class="couple"><strong>Saveatama Hunt</strong> <span class="origin">(Anisi)</span> <span class="vb">usugafa ia</span> <strong>Peka</strong> <span class="origin">o Saluafata</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid">Fata Rudolph</span><span class="kid">Francis</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(tama)</span><span class="kid">Florene</span><span class="kid">Leanora</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(teine)</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">6</div><div class="gen-card">
+      <div class="couple"><strong>Karl</strong></div>
+      <div class="epa">E pa (leai se tama) — suli</div>
+    </div></div>
+    <div class="gen"><div class="gen-num">7</div><div class="gen-card">
+      <div class="couple"><strong>Josephine</strong> <span class="origin">(Sose)</span> <span class="vb">usuia e</span> <strong>Frank Warren</strong></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid">Malvern</span><span class="kid">Tamaseu Fata Randy Clarence</span><span class="kid">Clemens</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(o tama)</span><span class="kid">Martle</span><span class="kid">April</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(teine)</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">8</div><div class="gen-card">
+      <div class="couple"><strong>Agnes</strong> <span class="origin">(Ake)</span> <span class="vb">usuia e</span> <strong>Frank Parrish</strong></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid">Trevor <small>(tama)</small></span><span class="kid">Diane</span><span class="kid">Lorraine</span><span class="kid">Adrience</span><span class="kid">Petrina</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(teine)</span></div>
+    </div></div>
+    <div class="gen"><div class="gen-num">9</div><div class="gen-card">
+      <div class="couple"><strong>Siemsen</strong>, toe usugafa — usuga lona II — <span class="vb">ia</span> <strong>Foumalo</strong> <span class="origin">le tuafafine o Pouono &amp; Li‘o Iosefa</span></div>
+      <div class="kids"><span class="kids-label">F/G</span><span class="kid">Joe</span><span class="kid">Henry</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(tama)</span><span class="kid">Shirley</span><span class="kid">Dora</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(teine)</span></div>
+        <details class="branch">
+          <summary>O latou fānau (a&ndash;e)</summary>
+          <div class="chain">
+            <div class="gen"><div class="gen-num">a</div><div class="gen-card">
+              <div class="couple"><strong>Joe Siemsen</strong> <span class="vb">usugafa ia</span> <strong>Anna</strong> <span class="origin">o le Apia lava</span></div>
+              <div class="kids"><span class="kids-label">F/G</span><span class="kid">Shane</span><span class="kid">Joseph</span><span class="kid">Karl Lose</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(o tama)</span><span class="kid">Josephine</span><span class="kid">Geraldine</span><span class="kid">Shirley</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(teine)</span></div>
+            </div></div>
+            <div class="gen"><div class="gen-num">b</div><div class="gen-card">
+              <div class="couple"><strong>Henry Siemsen</strong> <span class="vb">usugafa ia</span> <strong>Faye</strong></div>
+              <div class="kids"><span class="kids-label">F/G</span><span class="kid">Rudolph</span><span class="kid">Desmond</span><span class="kid">Ricardo</span><span class="kid">Byron</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(o tama)</span><span class="kid">Leanora <small>(teine)</small></span></div>
+            </div></div>
+            <div class="gen"><div class="gen-num">c</div><div class="gen-card">
+              <div class="couple"><strong>Shirley</strong> <span class="vb">usuia e</span> <strong>Bruce Millanda</strong></div>
+              <div class="kids"><span class="kids-label">F/G</span><span class="kid">Danny</span><span class="kid">Anthony</span><span class="kid">John</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(o tama)</span><span class="kid">Linda</span><span class="kid">Diane</span><span class="kid">Angela</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(teine)</span></div>
+            </div></div>
+            <div class="gen"><div class="gen-num">d</div><div class="gen-card">
+              <div class="couple"><strong>Dora</strong> <span class="vb">usuia e</span> <strong>Len Paton</strong></div>
+              <div class="kids"><span class="kids-label">F/G</span><span class="kid">Kelly</span><span class="kid">Dylan</span><span class="kid" style="background:none;border:none;padding:0;color:#8a765a">(tama)</span><span class="kid">Liane <small>(le teine)</small></span></div>
+            </div></div>
+            <div class="gen"><div class="gen-num">e</div><div class="gen-card">
+              <div class="couple"><strong>Rudolph</strong> <span class="origin">— le atali‘i o Henry Siemsen —</span> <span class="vb">usu ia</span> <strong>Leutogi Talitimu</strong> <span class="origin">o Fusi Safotulafai Savai‘i</span></div>
+              <div class="kids"><span class="kids-label">F/G</span><span class="kid">Hendrick</span></div>
+              <div class="note-line">&ldquo;O ia o le sa‘o o le aiga i le taimi nei 2015??&rdquo; — as written in the book.</div>
+            </div></div>
+          </div>
+        </details>
+    </div></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom" style="border-top:0">
+      <span>&copy; Le Laoa &middot; For the descendants of Su‘e Tu‘ulau</span>
+      <a href="reader.html?book=gafa" style="color:#cdbb9b">Read the original book</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('nav-toggle').addEventListener('click', function () {
+    document.getElementById('nav-links').classList.toggle('open');
+  });
+
+  // Name search: highlight matching generation cards across all three parts.
+  (function () {
+    var input = document.getElementById('name-search');
+    var count = document.getElementById('search-count');
+    var gens = Array.prototype.slice.call(document.querySelectorAll('.gen'));
+    function norm(s) { return s.toLowerCase().replace(/[‘’'ʻ]/g, ''); }
+    var texts = gens.map(function (g) { return norm(g.textContent); });
+    input.addEventListener('input', function () {
+      var q = norm(input.value.trim());
+      var hits = 0;
+      var first = null;
+      gens.forEach(function (g, i) {
+        var hit = q.length >= 2 && texts[i].indexOf(q) !== -1;
+        g.classList.toggle('hit', hit);
+        if (hit) {
+          hits++;
+          if (!first) first = g;
+          var d = g.closest('details');
+          if (d) d.open = true;
+          var p = g.querySelector('details');
+        }
+      });
+      count.textContent = q.length >= 2 ? (hits + (hits === 1 ? ' match' : ' matches')) : '';
+      if (first && q.length >= 3) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  })();
+</script>
+</body>
+</html>
